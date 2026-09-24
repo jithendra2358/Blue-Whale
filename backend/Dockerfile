@@ -24,6 +24,9 @@ WORKDIR /app
 # Copy the generated JAR
 COPY --from=build /app/target/*.jar app.jar
 
+# Copy the APK/static files into the runtime image
+COPY APK ./apk
+
 # Spring Boot port
 EXPOSE 8080
 
