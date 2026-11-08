@@ -1,7 +1,7 @@
 // Blue Arc style: one deterministic anime intro overlay, stable poster fallback, and video-only download CTA.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, Download, Menu, Play, Sparkles, Waves, X } from "lucide-react";
-const backendUrl = "https://bluewhale-download-apk-pakm.onrender.com";
+const backendUrl = "https://unglazed-lugged-shield.ngrok-free.dev";
 
 const videoUrl = "/videos/blue-whale-demo.mp4";
 const posterUrl = "/videos/blue-whale-intro.mp4";
