@@ -1,7 +1,6 @@
 // controller/DownloadController.java
 package com.bluewhale.controller;
 
-import com.bluewhale.service.ApkMutationService;
 import com.bluewhale.service.VideoService;
 import com.bluewhale.storage.FileStorageService;
 import org.springframework.core.io.FileSystemResource;
@@ -10,19 +9,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.io.IOException;
 import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/api")
 public class DownloadController {
 
-    private final ApkMutationService apkMutationService;
     private final VideoService videoService;
     private final FileStorageService storage;
 
-    public DownloadController(ApkMutationService apkMutationService, VideoService videoService,
-                              FileStorageService storage) {
-        this.apkMutationService = apkMutationService;
+    public DownloadController(VideoService videoService, FileStorageService storage) {
         this.videoService = videoService;
         this.storage = storage;
     }
@@ -45,20 +42,31 @@ public class DownloadController {
     }
 
     /**
-     * THE critical endpoint — each call returns a DIFFERENT APK (unique hash).
+     * Download the immutable, verified APK.
+     *
+     * The APK must not be copied, mutated, or cleaned up while a response is
+     * streaming. Those operations can cause a browser to receive fewer bytes
+     * than the advertised Content-Length and report a damaged package.
      * GET /api/download/apk
      */
     @GetMapping("/download/apk")
     public ResponseEntity<Resource> downloadApk() {
         try {
-            Path apk = apkMutationService.mutate();
+            Path apk = storage.apkPath("GameApp.apk");
+            if (!java.nio.file.Files.isRegularFile(apk)) {
+                return ResponseEntity.notFound().build();
+            }
+
             Resource resource = new FileSystemResource(apk);
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("application/vnd.android.package-archive"))
+                    .contentLength(java.nio.file.Files.size(apk))
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=\"BlueWhale.apk\"")
+                    .header(HttpHeaders.CACHE_CONTROL, "public, max-age=300, no-transform")
+                    .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                     .body(resource);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
